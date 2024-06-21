@@ -68,7 +68,6 @@ df_rstacks = int(df_rstack)
 df_stuck = (df_rett,df_dupp,df_unseenn,df_rstacks)
 df_ok = sum(df_stuck) / dff * 100
 df_total = 100 - df_ok
-#print('Network quality:', '%.2f'%(df_kontol / dff * 100),'%')
 print('Packets data transmission quality:', '%.2f'%(df_total),'%')
 print(75*'-')
 df_ftp = df['Protocol'].str.contains('FTP').sum()
