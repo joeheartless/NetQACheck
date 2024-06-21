@@ -1,16 +1,20 @@
 #!/usr/bin/python
-
+#
 #
 # written by @Prima Agus Setiawan 
 # a.k.a joeheartless 
-# a.k.a IT Kontol2an tanah
+# a.k.a IT Kontol2an Tanah
 #
 # published under universe license which means it's fvckin free.
 #
 # Modules
 # pip3 install pandas tkinter
+# 
+# the quality of network formula is very simple,
+# I simply sum event of TCP Dup, TCP Ret, TCP lost segment and some zero window event.
 #
-#
+# Wireshark columns 
+# | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
 
 import pandas as pd
 from tkinter import filedialog
