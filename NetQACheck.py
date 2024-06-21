@@ -10,7 +10,7 @@
 # Modules
 # pip3 install pandas tkinter
 # 
-# the quality of network formula is very simple,
+# The quality of network formula is very simple,
 # I simply sum event of TCP Dup, TCP Ret, TCP lost segment and some zero window event.
 #
 # In wireshark, export packets dissections as CSV file.
