@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 #
-# written by @Prima Agus Setiawan a.k.a joeheartless a.k.a IT Kontol2an tanah
+# written by @Prima Agus Setiawan 
+# a.k.a joeheartless 
+# a.k.a IT Kontol2an tanah
 #
 # published under universe license which means it's fvckin free.
 #
