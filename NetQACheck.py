@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 #
-# written by @Prima Agus Setiawan 
+# Written by Prima Agus Setiawan 
 # a.k.a joeheartless 
 # 
 #
@@ -14,7 +14,7 @@
 # I simply sum event of TCP Dup, TCP Ret, TCP lost segment and some zero window event.
 #
 # In wireshark, export packets dissections as CSV file.
-# Wireshark columns reference
+# Wireshark columns references for HTTP and TLS section report.
 # | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
 
 import pandas as pd
