@@ -5,3 +5,10 @@ Python Modules
 
 Wireshark column Preference
 | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
+
+Detections
+* TCP Retransmit
+* TCP Duplicated
+* Bottleneck
+* HTTP traffic (GET POST)
+* Non standard TLS Port (443)
