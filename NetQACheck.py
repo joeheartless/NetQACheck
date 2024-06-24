@@ -7,6 +7,7 @@
 #
 # published under universe license which means it's fvckin free.
 #
+#
 # Modules
 # pip3 install pandas tkinter
 # 
