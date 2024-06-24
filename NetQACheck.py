@@ -59,7 +59,7 @@ print('Total TCP handshake failed:', df_rstack)
 
 df_zerowindows = df['Info'].str.contains('TCP Window Full').sum()
 df_zerowindows1 = df['Info'].str.contains('TCP ZeroWindow').sum()
-df_bottleneck = df_zerowindows + df_zerowindows1
+df_bottleneck = df_zerowindows1
 print('Total Zero Window event: ',df_bottleneck)
 if df_bottleneck >= 1:
     print(" ===> There are indications of bottleneck")
@@ -91,9 +91,13 @@ except KeyError:
 gegarisan()
 print()
 def http_method():
-    print('HTTP request methode: GET')   
     df_http = df[df['Protocol'].str.contains('HTTP')]
     df_get = df_http[df_http['Info'].str.contains('GET')]
+    df_common = df_http[~df_http['Info'].str.contains('GET')]
+    print('Common HTTP traffic')
+    print(df_common['HTTP'].value_counts().to_string())
+    print()
+    print('HTTP request methode: GET')
     print(df_get['HTTP'].value_counts().to_string())
     print('-')
     print('HTTP request methode: POST')
