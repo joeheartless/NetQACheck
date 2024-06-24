@@ -15,7 +15,8 @@ Detections
 
 No SSDP Contains. 
 If you want to enable it just comment on this section
+
 '''
-# df = df_raw
+df = df_raw
 df = df_raw[~df_raw['Protocol'].str.contains('SSDP')]
 '''
