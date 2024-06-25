@@ -57,20 +57,21 @@ print('Total lost packets during transmission:', df_unseen)
 df_rstack = df['Info'].str.contains('RST, ACK').sum()
 print('Total TCP handshake failed:', df_rstack)
 
-df_zerowindows = df['Info'].str.contains('TCP Window Full').sum()
-df_zerowindows1 = df['Info'].str.contains('TCP ZeroWindow').sum()
-df_bottleneck = df_zerowindows1
-print('Total Zero Window event: ',df_bottleneck)
-if df_bottleneck >= 1:
+df_windowfull = df['Info'].str.contains('TCP Window Full').sum()
+df_bottlenecksum = df['Info'].str.contains('TCP ZeroWindow').sum()
+df_bottleneck = df[df['Info'].str.contains('TCP ZeroWindow')]
+print('Total Zero Window event: ',df_bottlenecksum)
+if df_bottlenecksum >= 1:
     print(" ===> There are indications of bottleneck")
-
+    print(df_bottleneck[['Source','Destination','Calculated window size','Info']])
+print()
 def net_quality():
     dff = int(len(df_raw))
     df_rett = int(df_ret)
     df_dupp = int(df_dup)
     df_unseenn = int(df_unseen)
     df_rstacks = int(df_rstack)
-    df_stuck = (df_rett,df_dupp,df_unseenn,df_rstacks)
+    df_stuck = (df_rett,df_dupp,df_unseenn,df_rstacks,df_bottlenecksum)
     df_ok = sum(df_stuck) / dff * 100
     df_total = 100 - df_ok
     print('Packets data transmission quality:', '%.2f'%(df_total),'%')
