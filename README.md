@@ -1,12 +1,12 @@
-### Net Quality Assurance Check
-# Python Modules
+# Net Quality Assurance Check
+### Python Modules
 * pandas
 * tkinter
 
-# Wireshark column Preference
+### Wireshark column Preference
 | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
 
-# Detections
+### Detections
 * TCP Retransmit
 * TCP Duplicated
 * Bottleneck
