@@ -1,16 +1,17 @@
-## Net Quality Assurance Check
-Python Modules
+### Net Quality Assurance Check
+# Python Modules
 * pandas
 * tkinter
 
-Wireshark column Preference
+# Wireshark column Preference
 | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
 
-Detections
+# Detections
 * TCP Retransmit
 * TCP Duplicated
 * Bottleneck
-* HTTP traffic (GET POST)
+* Port Scanning Detection
+* HTTP traffic (GET & POST)
 * Non standard TLS Port (443)
 
 If you need SSDP Contains in dataset, enable it just comment on this section.
