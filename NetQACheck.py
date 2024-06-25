@@ -55,7 +55,9 @@ df_unseen = df['Info'].str.contains('TCP ACKed unseen').sum()
 print('Total lost packets during transmission:', df_unseen)
 
 df_rstack = df['Info'].str.contains('RST, ACK').sum()
-print('Total TCP handshake failed:', df_rstack)
+print('Total Reset ACK:', df_rstack)
+if df_rstack >= 200:
+    print(" ===> There are indications of port scanning")
 
 df_windowfull = df['Info'].str.contains('TCP Window Full').sum()
 df_bottlenecksum = df['Info'].str.contains('TCP ZeroWindow').sum()
@@ -71,7 +73,7 @@ def net_quality():
     df_dupp = int(df_dup)
     df_unseenn = int(df_unseen)
     df_rstacks = int(df_rstack)
-    df_stuck = (df_rett,df_dupp,df_unseenn,df_rstacks,df_bottlenecksum)
+    df_stuck = (df_rett,df_dupp,df_unseenn,df_bottlenecksum)
     df_ok = sum(df_stuck) / dff * 100
     df_total = 100 - df_ok
     print('Packets data transmission quality:', '%.2f'%(df_total),'%')
@@ -83,6 +85,9 @@ print('Non TLS connection [FTP] :',df_ftp)
 
 df_telnet = df['Protocol'].str.contains('TELNET').sum()
 print('Non TLS connection [TELNET] :',df_telnet)
+
+if 'HTTP' not in df:
+    print("Please add 'HTTP' as a column name and fields 'http.host' in Wireshark.")
 
 try:
     http = df['HTTP'].isnull() == False
@@ -113,6 +118,7 @@ except KeyError:
     print()
 gegarisan()
 print()
+
 def freak_tls():
     print('Non Standard TLS Connection')
     df_tls = df[df['Protocol'].str.contains('TLS')]
