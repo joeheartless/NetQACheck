@@ -4,7 +4,12 @@
 * tkinter
 
 ### Wireshark column Preference
-| Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
+Time | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | TCP Length | Calculated window size | User Agent HTTP | Flags | Info
+
+or import My custom Wireshark Profile
+```
+https://drive.google.com/file/d/1vEWe9n66ql4q5_BWASJjXf1ODDh7bTjS/view?usp=sharing
+```
 
 ### Detections
 * TCP Retransmit
