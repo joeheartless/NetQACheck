@@ -16,7 +16,7 @@
 #
 # In wireshark, export packets dissections as CSV file.
 # Wireshark columns references for HTTP and TLS section report.
-# | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | Calculated window size | Info
+# Time | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | TCP Length | Calculated window size | User Agent HTTP | Flags | Info
 
 import pandas as pd
 from tkinter import filedialog
