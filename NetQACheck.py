@@ -29,7 +29,7 @@ print('               NETWORK QUALITY ASSURANCE CHECK            ')
 gegarisan()
 
 def read_csv():
-    return pd.read_csv(filedialog.askopenfilename(filetypes=[("CSV File",".csv")]))
+    return pd.read_csv(filedialog.askopenfilename(filetypes=[("CSV File",".csv")]), low_memory=False)
 
 df_raw = read_csv()
 print(df_raw[['Source','Destination','Info']])
@@ -61,7 +61,7 @@ if df_rstack >= 200:
 
 df_windowfull = df['Info'].str.contains('TCP Window Full').sum()
 df_bottlenecksum = df['Info'].str.contains('TCP ZeroWindow').sum()
-df_bottleneck = df[df['Info'].str.contains('TCP ZeroWindow')]
+df_bottleneck = df[df['Info'].str.contains('TCP ZeroWindow', na=False)]
 print('Total Zero Window event: ',df_bottlenecksum)
 if df_bottlenecksum >= 1:
     print(" ===> There are indications of bottleneck")
