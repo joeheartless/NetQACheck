@@ -21,114 +21,134 @@
 import pandas as pd
 from tkinter import filedialog
 
-def gegarisan():
-    return print(75*'-')
+def print_separator():
+    print(75 * '-')
 
-gegarisan()
+def read_csv_file():
+    """Prompts user to select a CSV file and reads it into a DataFrame."""
+    file_path = filedialog.askopenfilename(filetypes=[("CSV File", ".csv")])
+    if not file_path:
+        print("No file selected.")
+        return None
+    return pd.read_csv(file_path, low_memory=False)
+
+def count_occurrences(df, column, keyword):
+    """Counts occurrences of a specific keyword in a DataFrame column."""
+    return df[column].str.contains(keyword, na=False).sum()
+
+print_separator()
 print('               NETWORK QUALITY ASSURANCE CHECK            ')
-gegarisan()
+print_separator()
 
-def read_csv():
-    return pd.read_csv(filedialog.askopenfilename(filetypes=[("CSV File",".csv")]), low_memory=False)
+df_raw = read_csv_file()
+if df_raw is None:
+    exit()
 
-df_raw = read_csv()
-print(df_raw[['Source','Destination','Info']])
-gegarisan()
+print(df_raw[['Source', 'Destination', 'Info']])
+print_separator()
 print(df_raw['Protocol'].value_counts().to_string())
 
-did = df_raw['Destination'].mode().item()
-dis = df_raw['Source'].mode().item()
-if did == dis:  
-    print("Host IP Addr: ",did)
+most_common_dest = df_raw['Destination'].mode().iloc[0]
+most_common_source = df_raw['Source'].mode().iloc[0]
+if most_common_dest == most_common_source:
+    print("Host IP Address: ", most_common_dest)
 
-gegarisan()
+print_separator()
 print('Total captured packets: ', len(df_raw))
 
-df = df_raw[~df_raw['Protocol'].str.contains('SSDP')]
-df_ret = df['Info'].str.contains('TCP Ret').sum()
-print('Total retransmitted packets:', df_ret)
+df_filtered = df_raw[~df_raw['Protocol'].str.contains('SSDP', na=False)]
+retransmitted_packets = count_occurrences(df_filtered, 'Info', 'TCP Ret')
+duplicated_packets = count_occurrences(df_filtered, 'Info', 'TCP Dup')
+lost_packets = count_occurrences(df_filtered, 'Info', 'TCP ACKed unseen')
+reset_ack_packets = count_occurrences(df_filtered, 'Info', 'RST, ACK')
+tcp_window_full = count_occurrences(df_filtered, 'Info', 'TCP Window Full')
+zero_window_events = count_occurrences(df_filtered, 'Info', 'TCP ZeroWindow')
 
-df_dup = df['Info'].str.contains('TCP Dup').sum()
-print('Total duplicated packets:', df_dup)
+print('Total retransmitted packets:', retransmitted_packets)
+print('Total duplicated packets:', duplicated_packets)
+print('Total lost packets during transmission:', lost_packets)
+print('Total Reset ACK:', reset_ack_packets)
+print('Total Zero Window events:', zero_window_events)
+print('Total TCP Window Full events (Congestion):', tcp_window_full)
 
-df_unseen = df['Info'].str.contains('TCP ACKed unseen').sum()
-print('Total lost packets during transmission:', df_unseen)
+if reset_ack_packets >= 200:
+    print(" ===> Possible port scanning detected")
+if zero_window_events >= 1:
+    print(" ===> Potential bottleneck detected")
+    print(df_filtered[df_filtered['Info'].str.contains('TCP ZeroWindow', na=False)][['Source', 'Destination', 'Info']])
 
-df_rstack = df['Info'].str.contains('RST, ACK').sum()
-print('Total Reset ACK:', df_rstack)
-if df_rstack >= 200:
-    print(" ===> There are indications of port scanning")
+def calculate_network_quality():
+    total_packets = len(df_raw)
+    if total_packets == 0:
+        print("No packets captured, unable to calculate network quality.")
+        return
 
-df_windowfull = df['Info'].str.contains('TCP Window Full').sum()
-df_bottlenecksum = df['Info'].str.contains('TCP ZeroWindow').sum()
-df_bottleneck = df[df['Info'].str.contains('TCP ZeroWindow', na=False)]
-print('Total Zero Window event: ',df_bottlenecksum)
-if df_bottlenecksum >= 1:
-    print(" ===> There are indications of bottleneck")
-    print(df_bottleneck[['Source','Destination','Calculated window size','Info']])
-print()
-def net_quality():
-    dff = int(len(df_raw))
-    df_rett = int(df_ret)
-    df_dupp = int(df_dup)
-    df_unseenn = int(df_unseen)
-    df_rstacks = int(df_rstack)
-    df_stuck = (df_rett,df_dupp,df_unseenn,df_bottlenecksum)
-    df_ok = sum(df_stuck) / dff * 100
-    df_total = 100 - df_ok
-    print('Packets data transmission quality:', '%.2f'%(df_total),'%')
-net_quality()
-gegarisan()
-print()
-df_ftp = df['Protocol'].str.contains('FTP').sum()
-print('Non TLS connection [FTP] :',df_ftp)
-
-df_telnet = df['Protocol'].str.contains('TELNET').sum()
-print('Non TLS connection [TELNET] :',df_telnet)
-
-if 'HTTP' not in df:
-    print("Please add 'HTTP' as a column name and fields 'http.host' in Wireshark.")
-
-try:
-    http = df['HTTP'].isnull() == False
-    print('Non TLS connection [HTTP contains link]:', http.sum())
-except KeyError:
-    print()
-gegarisan()
-print()
-def http_method():
-    df_http = df[df['Protocol'].str.contains('HTTP')]
-    df_get = df_http[df_http['Info'].str.contains('GET')]
-    df_common = df_http[~df_http['Info'].str.contains('GET')]
-    print('Common HTTP traffic')
-    print(df_common['HTTP'].value_counts().to_string())
-    print()
-    print('HTTP request methode: GET')
-    print(df_get['HTTP'].value_counts().to_string())
-    print('-')
-    print('HTTP request methode: POST')
-    df_post = df_http[df_http['Info'].str.contains('POST')]
-    print(df_post['HTTP'].value_counts().to_string())
-    print('-')  
-    print('Please visit https://urlhaus.abuse.ch/ for website legitimate check.')
-
-try:
-    http_method()
-except KeyError:
-    print()
-gegarisan()
-print()
-
-def freak_tls():
-    print('Non Standard TLS Connection')
-    df_tls = df[df['Protocol'].str.contains('TLS')]
-    df_freak_tls_src = df_tls[(df_tls['Src Port'] == 443) == False]
-    df_non_standard_tls_port = df_freak_tls_src[(df_freak_tls_src['Destination Port'] == 443) == False]
-    print(df_non_standard_tls_port[['Source','Src Port','Destination','Destination Port','Info']])
-    print('For letigimate check, please open .pcap file and check certificate issuer')
+    # Weighted Impact Calculation
+    weighted_issues = (
+        (1.2 * retransmitted_packets) + 
+        (1.0 * duplicated_packets) + 
+        (1.5 * lost_packets) + 
+        (1.3 * zero_window_events) + 
+        (1.4 * tcp_window_full) + 
+        (1.1 * reset_ack_packets)
+    )
     
-try:
-    freak_tls()
-except KeyError:
+    # Normalization to prevent drastic drops
+    issue_ratio = min(weighted_issues / total_packets, 1)  # Cap to max 1 (100%)
+    quality_score = 100 * (1 - issue_ratio)
+    
+    print(f"Packet data transmission quality: {quality_score:.2f}%")
+
+calculate_network_quality()
+print_separator()
+
+ftp_connections = count_occurrences(df_filtered, 'Protocol', 'FTP')
+telnet_connections = count_occurrences(df_filtered, 'Protocol', 'TELNET')
+
+print('Non-TLS connections [FTP]:', ftp_connections)
+print('Non-TLS connections [TELNET]:', telnet_connections)
+
+if 'HTTP' not in df_filtered.columns:
+    print("Please add 'HTTP' as a column name and include 'http.host' in Wireshark.")
+else:
+    print('Non-TLS connections [HTTP contains link]:', df_filtered['HTTP'].notnull().sum())
+
+print_separator()
+
+def analyze_http_traffic():
+    if 'HTTP' not in df_filtered.columns:
+        print("HTTP column not found in data.")
+        return
+
+    http_traffic = df_filtered[df_filtered['Protocol'].str.contains('HTTP', na=False)]
+    get_requests = http_traffic[http_traffic['Info'].str.contains('GET', na=False)]
+    post_requests = http_traffic[http_traffic['Info'].str.contains('POST', na=False)]
+    
+    print('Common HTTP traffic')
+    print(http_traffic['HTTP'].value_counts().to_string())
     print()
-gegarisan()
+    print('HTTP request method: GET')
+    print(get_requests['HTTP'].value_counts().to_string())
+    print('-')
+    print('HTTP request method: POST')
+    print(post_requests['HTTP'].value_counts().to_string())
+    print('-')
+    print('For website legitimacy checks, visit: https://urlhaus.abuse.ch/')
+
+analyze_http_traffic()
+print_separator()
+
+def analyze_tls_traffic():
+    if 'Src Port' not in df_filtered.columns or 'Destination Port' not in df_filtered.columns:
+        print("'Src Port' or 'Destination Port' column not found in data.")
+        return
+
+    tls_traffic = df_filtered[df_filtered['Protocol'].str.contains('TLS', na=False)]
+    non_standard_tls = tls_traffic[(tls_traffic['Src Port'] != 443) & (tls_traffic['Destination Port'] != 443)]
+    
+    print('Non-Standard TLS Connections')
+    print(non_standard_tls[['Source', 'Src Port', 'Destination', 'Destination Port', 'Info']])
+    print('For legitimacy verification, open the .pcap file and check the certificate issuer.')
+
+analyze_tls_traffic()
+print_separator()
