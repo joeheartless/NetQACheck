@@ -3,19 +3,6 @@
 #
 # Written by Prima Agus Setiawan 
 # a.k.a joeheartless 
-# 
-#
-# published under universe license which means it's fvckin free.
-#
-#
-# Modules
-# pip3 install pandas tkinter
-# 
-# The quality of network formula is very simple,
-# I simply sum event of TCP Dup, TCP Ret, TCP lost segment and some zero window event.
-#
-# In wireshark, export packets dissections as CSV file.
-# Wireshark columns references for HTTP and TLS section report.
 # Time | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | TCP Length | Calculated window size | User Agent HTTP | Flags | Info
 
 import pandas as pd
