@@ -20,13 +20,13 @@ This script analyzes network packet capture data to assess network quality by id
 - Python 3.x
 - Required libraries:
   ```bash
-  pip install pandas
+  pip3 install pandas
   ```
 
 ## Usage
 1. Run the script:
    ```bash
-   python network_qc_analysis.py
+   python3 NetQACheck.py
    ```
 2. Select a network capture CSV file when prompted.
 3. The script will process the data and display network quality metrics.
