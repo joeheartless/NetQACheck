@@ -1,29 +1,70 @@
-# Net Quality Assurance Check
-### Python Modules
-* pandas
-* tkinter
+Network Quality Assurance Check
 
-### Wireshark column Preference
-Time | Source | Src Port | Destination | Destination Port | Protocol | TLS | HTTP | Sequence Number | Length | TCP Length | Calculated window size | User Agent HTTP | Flags | Info
+Overview
 
-or import My custom Wireshark Profile
-```
-https://drive.google.com/file/d/1vEWe9n66ql4q5_BWASJjXf1ODDh7bTjS/view?usp=sharing
-```
+This script analyzes network packet capture data to assess network quality by identifying various network issues, such as retransmissions, duplicate packets, packet loss, congestion, and potential security threats.
 
-### Detections
-* TCP Retransmit
-* TCP Duplicated
-* Bottleneck
-* Port Scanning Detection
-* HTTP traffic (GET & POST)
-* Non standard TLS Port (443)
+Features
 
-If you need SSDP Contains in dataset, enable it just comment on this section.
-```
-df = df_raw
-# df = df_raw[~df_raw['Protocol'].str.contains('SSDP')]
-```
+Reads a CSV file containing network packet capture data.
+
+Analyzes packet statistics including:
+
+Protocol distribution
+
+Retransmitted, duplicated, and lost packets
+
+TCP congestion and zero window events
+
+Possible port scanning detection
+
+Calculates overall network quality based on weighted impact factors.
+
+Identifies non-TLS connections (FTP, TELNET, HTTP) and potential security risks.
+
+Analyzes HTTP traffic methods (GET, POST) and identifies unusual activity.
+
+Detects non-standard TLS connections.
+
+Installation
+
+Prerequisites
+
+Python 3.x
+
+Required libraries:
+
+pip install pandas
+
+Usage
+
+Run the script:
+
+python network_qc_analysis.py
+
+Select a network capture CSV file when prompted.
+
+The script will process the data and display network quality metrics.
+
+Network Quality Calculation
+
+The network quality score is calculated as:
+
+quality_score = 100 * (1 - issue_ratio)
+
+Where issue_ratio is determined using weighted occurrences of network issues:
+
+Retransmitted packets: 1.2x weight
+
+Duplicated packets: 1.0x weight
+
+Lost packets: 1.5x weight
+
+Zero window events: 1.3x weight
+
+TCP window full (congestion): 1.4x weight
+
+Reset ACK packets: 1.1x weight
 
 ref:
 ```
