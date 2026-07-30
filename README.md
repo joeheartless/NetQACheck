@@ -230,9 +230,14 @@ It should be noted that the weighting factors and scoring thresholds used in thi
 Therefore, the scoring system implemented in this project should be interpreted as a practical engineering heuristic rather than an authoritative industry standard. The primary objective is to provide a consistent, repeatable, and easily interpretable assessment of TCP network quality that remains comparable across different packet capture sizes and network environments.
 
 
-
 ref:
 ```
-https://www.malware-traffic-analysis.net/
-https://unit42.paloaltonetworks.com/
+- RFC 793 – Transmission Control Protocol
+- RFC 1122 – Requirements for Internet Hosts – Communication Layers
+- RFC 5681 – TCP Congestion Control
+- RFC 6298 – Computing TCP Retransmission Timer
+- Wireshark User Guide – TCP Analysis Flags
+- Stevens, W. Richard. TCP/IP Illustrated, Volume 1.
+- https://www.malware-traffic-analysis.net/
+- https://unit42.paloaltonetworks.com/
 ```
