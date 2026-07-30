@@ -86,59 +86,19 @@ RST packets are calculated against the number of TCP sessions because they repre
 
 ## Quality Score Conversion
 
-Each event rate is converted into a quality score between **50 and 100**.
+Each event rate is converted into a quality score ranging from **50** (Critical) to **100** (Excellent).
 
-### Retransmission Rate
+| Score | Retransmission Rate | Duplicate ACK Rate | TCP Window Full Rate | TCP Zero Window Rate | TCP Reset (RST) Rate |
+|------:|--------------------:|-------------------:|----------------------:|---------------------:|----------------------:|
+| **100** | ≤ 0.10% | ≤ 0.50% | ≤ 0.05% | 0.00% | ≤ 1.00% |
+| **95** | ≤ 0.50% | ≤ 1.00% | ≤ 0.20% | ≤ 0.05% | ≤ 3.00% |
+| **85** | ≤ 1.00% | ≤ 2.00% | ≤ 0.50% | ≤ 0.10% | ≤ 5.00% |
+| **70** | ≤ 2.00% | ≤ 5.00% | ≤ 1.00% | ≤ 0.50% | ≤ 10.00% |
+| **50** | > 2.00% | > 5.00% | > 1.00% | > 0.50% | > 10.00% |
 
-| Rate | Score |
-|------|------:|
-| ≤ 0.10% | 100 |
-| ≤ 0.50% | 95 |
-| ≤ 1.00% | 85 |
-| ≤ 2.00% | 70 |
-| > 2.00% | 50 |
-
-### Duplicate ACK Rate
-
-| Rate | Score |
-|------|------:|
-| ≤ 0.50% | 100 |
-| ≤ 1.00% | 95 |
-| ≤ 2.00% | 85 |
-| ≤ 5.00% | 70 |
-| > 5.00% | 50 |
-
-### TCP Window Full Rate
-
-| Rate | Score |
-|------|------:|
-| ≤ 0.05% | 100 |
-| ≤ 0.20% | 95 |
-| ≤ 0.50% | 85 |
-| ≤ 1.00% | 70 |
-| > 1.00% | 50 |
-
-### TCP Zero Window Rate
-
-| Rate | Score |
-|------|------:|
-| 0.00% | 100 |
-| ≤ 0.05% | 95 |
-| ≤ 0.10% | 85 |
-| ≤ 0.50% | 70 |
-| > 0.50% | 50 |
-
-### TCP Reset (RST) Rate
-
-| Rate | Score |
-|------|------:|
-| ≤ 1.00% | 100 |
-| ≤ 3.00% | 95 |
-| ≤ 5.00% | 85 |
-| ≤ 10.00% | 70 |
-| > 10.00% | 50 |
-
----
+> **Note**
+>
+> Lower event rates indicate healthier TCP communication. Therefore, a **smaller percentage results in a higher quality score**, while higher event rates reduce the overall Network Health Score.
 
 ## Overall Network Health Score
 
