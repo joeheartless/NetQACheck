@@ -46,14 +46,14 @@ print('Total captured packets: ', len(df_raw))
 df_filtered = df_raw[~df_raw['Protocol'].str.contains('SSDP', na=False)]
 retransmitted_packets = count_occurrences(df_filtered, 'Info', 'TCP Ret')
 duplicated_packets = count_occurrences(df_filtered, 'Info', 'TCP Dup')
-lost_packets = count_occurrences(df_filtered, 'Info', 'TCP ACKed unseen')
+acked_unseen = count_occurrences(df_filtered, 'Info', 'TCP ACKed unseen')
 reset_ack_packets = count_occurrences(df_filtered, 'Info', 'RST, ACK')
 tcp_window_full = count_occurrences(df_filtered, 'Info', 'TCP Window Full')
 zero_window_events = count_occurrences(df_filtered, 'Info', 'TCP ZeroWindow')
 
 print('Total retransmitted packets:', retransmitted_packets)
 print('Total duplicated packets:', duplicated_packets)
-print('Total lost packets during transmission:', lost_packets)
+print('Total lost packets during transmission:', acked_unseen)
 print('Total Reset ACK:', reset_ack_packets)
 print('Total Zero Window events:', zero_window_events)
 print('Total TCP Window Full events (Congestion):', tcp_window_full)
@@ -64,27 +64,135 @@ if zero_window_events >= 1:
     print(" ===> Potential bottleneck detected")
     print(df_filtered[df_filtered['Info'].str.contains('TCP ZeroWindow', na=False)][['Source', 'Destination', 'Info']])
 
-def calculate_network_quality():
-    total_packets = len(df_raw)
-    if total_packets == 0:
-        print("No packets captured, unable to calculate network quality.")
-        return
+def score_by_rate(rate, excellent, good, fair, poor):
+    """
+    Convert event rate (%) into score (0-100)
 
-    # Weighted Impact Calculation
-    weighted_issues = (
-        (1.2 * retransmitted_packets) + 
-        (1.0 * duplicated_packets) + 
-        (1.5 * lost_packets) + 
-        (1.3 * zero_window_events) + 
-        (1.4 * tcp_window_full) + 
-        (1.1 * reset_ack_packets)
+    excellent : maximum rate for score 100
+    good      : maximum rate for score 95
+    fair      : maximum rate for score 85
+    poor      : maximum rate for score 70
+    """
+
+    if rate <= excellent:
+        return 100
+    elif rate <= good:
+        return 95
+    elif rate <= fair:
+        return 85
+    elif rate <= poor:
+        return 70
+    else:
+        return 50
+
+
+def calculate_network_quality():
+
+    tcp_packets = len(
+        df_filtered[
+            df_filtered["Protocol"].str.contains("TCP", na=False)
+        ]
     )
-    
-    # Normalization to prevent drastic drops
-    issue_ratio = min(weighted_issues / total_packets, 1)  # Cap to max 1 (100%)
-    quality_score = 100 * (1 - issue_ratio)
-    
-    print(f"Packet data transmission quality: {quality_score:.2f}%")
+
+    if tcp_packets == 0:
+        tcp_packets = 1
+
+    tcp_sessions = len(
+        df_filtered[
+            df_filtered["Info"].str.contains("SYN", na=False)
+        ]
+    )
+
+    if tcp_sessions == 0:
+        tcp_sessions = 1
+
+    retrans_rate = retransmitted_packets / tcp_packets * 100
+    dup_rate = duplicated_packets / tcp_packets * 100
+    previous_segment = count_occurrences(
+        df_filtered,
+        "Info",
+        "Previous segment not captured"
+    )
+
+    fast_retrans = count_occurrences(
+        df_filtered,
+        "Info",
+        "Fast Retransmission"
+    )
+
+    spurious_retrans = count_occurrences(
+        df_filtered,
+        "Info",
+        "Spurious Retransmission"
+    )
+
+    zero_window_rate = zero_window_events / tcp_packets * 100
+    congestion_rate = tcp_window_full / tcp_packets * 100
+    rst_rate = reset_ack_packets / tcp_sessions * 100
+
+    # -----------------------------
+    # Individual Score
+    # -----------------------------
+
+    retrans_score = score_by_rate(retrans_rate, 0.10, 0.50, 1.00, 2.00)
+
+    dup_score = score_by_rate(dup_rate, 0.50, 1.00, 2.00, 5.00)
+
+    zero_score = score_by_rate(zero_window_rate, 0.00, 0.05, 0.10, 0.50)
+
+    congestion_score = score_by_rate(congestion_rate, 0.05, 0.20, 0.50, 1.00)
+
+    rst_score = score_by_rate(rst_rate, 1.00, 3.00, 5.00, 10.00)
+
+    # -----------------------------
+    # Overall Score
+    # -----------------------------
+
+    overall = (
+        retrans_score * 0.50
+        + dup_score * 0.20
+        + congestion_score * 0.10
+        + zero_score * 0.10
+        + rst_score * 0.10
+    )
+
+    # -----------------------------
+    # Grade
+    # -----------------------------
+
+    if overall >= 97:
+        grade = "A+ (Excellent)"
+    elif overall >= 94:
+        grade = "A (Very Good)"
+    elif overall >= 90:
+        grade = "B (Good)"
+    elif overall >= 80:
+        grade = "C (Fair)"
+    elif overall >= 70:
+        grade = "D (Poor)"
+    else:
+        grade = "F (Critical)"
+
+    # -----------------------------
+    # Report
+    # -----------------------------
+
+    print()
+    print("==============================")
+    print("NETWORK HEALTH REPORT")
+    print("==============================")
+
+    print(f"TCP Packets          : {tcp_packets:,}")
+    print(f"TCP Sessions         : {tcp_sessions:,}")
+    print(f"Retransmission Rate  : {retrans_rate:.3f}%")
+    print(f"Duplicate ACK Rate   : {dup_rate:.3f}%")
+    print(f"Window Full Rate     : {congestion_rate:.3f}%")
+    print(f"Zero Window Rate     : {zero_window_rate:.3f}%")
+    print(f"RST Rate             : {rst_rate:.3f}%")
+    print()
+
+    print(f"Overall Score        : {overall:.2f}/100")
+    print(f"Grade                : {grade}")
 
 calculate_network_quality()
 print_separator()
