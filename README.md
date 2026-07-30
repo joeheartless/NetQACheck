@@ -178,6 +178,49 @@ The weighting prioritizes TCP retransmissions because they are generally the str
 
 ---
 
+## Example Output
+
+Below is an example report generated from a Wireshark CSV export.
+
+```text
+Host IP Address: 192.168.0.51
+
+---------------------------------------------------------------------------
+Total captured packets: 243416
+Total retransmitted packets: 693
+Total duplicated packets: 2259
+TCP ACKed unseen: 23992
+Total Reset ACK: 54
+Total Zero Window events: 0
+Total TCP Window Full events (Congestion): 0
+
+==============================
+NETWORK HEALTH REPORT
+==============================
+
+TCP Packets          : 182,896
+TCP Sessions         : 7,110
+
+Retransmission Rate  : 0.379%
+Duplicate ACK Rate   : 1.235%
+Window Full Rate     : 0.000%
+Zero Window Rate     : 0.000%
+RST Rate             : 0.759%
+
+Overall Score        : 94.50/100
+Grade                : A (Very Good)
+```
+
+### Interpretation
+
+- **Retransmission Rate (0.379%)** indicates that only a small percentage of TCP packets required retransmission, suggesting a stable transmission path.
+- **Duplicate ACK Rate (1.235%)** is within a normal range and indicates only minor TCP recovery activity.
+- **Window Full Rate (0.000%)** shows no indication of sender-side congestion.
+- **Zero Window Rate (0.000%)** indicates that the receiving host did not experience receive-buffer exhaustion.
+- **RST Rate (0.759%)** is considered normal for typical client/server communications where connections are frequently opened and closed.
+
+Overall, this capture represents a **healthy TCP network** with only minor retransmissions and no significant congestion detected.
+
 ## Design Philosophy
 
 The scoring model is inspired by common network performance assessment practices used in enterprise monitoring solutions. While it is not derived from a single RFC, IEEE standard, or vendor specification, it follows a normalized event-rate and weighted scoring approach to provide a practical and consistent indicator of TCP network health.
