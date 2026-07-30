@@ -1,19 +1,40 @@
-# Network Quality Assurance Check
+# NetQACheck by Prima Agus Setiawan
+
+**TCP Network Quality Analyzer for Wireshark CSV Exports**
+
+---
 
 ## Overview
-This script analyzes network packet capture data to assess network quality by identifying various network issues, such as retransmissions, duplicate packets, packet loss, congestion, and potential security threats.
+
+NetQACheck analyzes packet capture data exported from **Wireshark** to evaluate **TCP network quality** using a normalized **event-rate** and **weighted scoring** model.
+
+Instead of relying on raw event counts, the tool normalizes TCP transmission events into percentages, allowing captures of different sizes to be compared consistently.
+
+Besides network quality assessment, NetQACheck also summarizes protocol statistics, detects common TCP anomalies, identifies plaintext application protocols, and highlights potential security-related observations.
+
+---
 
 ## Features
-- Reads a CSV file containing network packet capture data.
-- Analyzes packet statistics including:
-  - Protocol distribution
-  - Retransmitted, duplicated, and lost packets
-  - TCP congestion and zero window events
-  - Possible port scanning detection
-- Calculates overall network quality based on weighted impact factors.
-- Identifies non-TLS connections (FTP, TELNET, HTTP) and potential security risks.
-- Analyzes HTTP traffic methods (GET, POST) and identifies unusual activity.
+
+- Parses Wireshark CSV packet captures.
+- Displays protocol distribution statistics.
+- Automatically detects the primary host IP address.
+- Calculates TCP transmission quality metrics:
+  - TCP Retransmission Rate
+  - TCP Duplicate ACK Rate
+  - TCP Window Full Rate
+  - TCP Zero Window Rate
+  - TCP Reset (RST) Rate
+- Generates an overall **TCP Network Health Score** using weighted scoring.
+- Detects plaintext application protocols:
+  - HTTP
+  - FTP
+  - TELNET
 - Detects non-standard TLS connections.
+- Summarizes HTTP request methods (GET / POST).
+- Highlights possible TCP congestion and abnormal connection behavior.
+
+---
 
 ## Installation
 ### Prerequisites
